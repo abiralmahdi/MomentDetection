@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streaming App</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .video-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        video {
+            width: 48%;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+        }
+        .frames-container {
+            display: flex;
+            justify-content: center;
+        }
+        .frames-container img {
+            width: 120px;
+            height: auto;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .frames-scroll-container {
+    width: 90%; /* Set width to 50% */
+    overflow-x: scroll;
+    background: #f8f9fa;
+    border: 1px solid #ddd; /* Optional: Add border for better visibility */
+}
+
+.frames-container {
+    display: flex;
+}
+
+.frame-thumbnail {
+    width: 100px !important;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
+
+.frame-thumbnail:hover {
+    border: 2px solid #007bff;
+}
+
+    </style>
+</head>
+<body style="background-image:linear-gradient(rgba(255, 255, 255, 0.733), rgba(255, 255, 255, 0.733)), url('{{ url_for('static', filename='images/bg.jpeg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+
+    <div class="container">
+        <h2 class="text-center mb-4 mt-5">VisionGuard: AI-powered Intelligent Video Anomaly Detection Based on Text Queries</h2>
+
+        <div class="video-container">
+            <video id="leftVideo" controls class="shadow">
+                {% if video_path %}
+                <source src="{{ video_path }}" type="video/mp4">
+                {% endif %}
+                Your browser does not support the video tag.
+            </video>
+        
+            <video id="rightVideo" controls class="shadow">
+                {% if clipped_video %}
+                <source src="{{ clipped_video }}" type="video/mp4">
+                {% endif %}
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        
+
+    <div class="d-flex">
+        <!-- File Upload -->
+        <form method="POST" action="/upload" enctype="multipart/form-data" class="my-3 w-100">
+            <div class="d-flex align-items-center">
+                <input type="file" class="form-control w-75 me-2 shadow" name="videoFile" accept="video/*" required>
+                <button type="submit" class="btn btn-dark btn-sm shadow">Upload</button>
+            </div>
+        </form>
+        <!-- Frame Scrubber -->
+        <div class="frames-scroll-container shadow">
+            <div class="frames-container">
+                {% for frame in frames %}
+                    {% if frame == start_frame or frame == end_frame %}
+                        <img src="{{ frame }}" class="frame-thumbnail" style="border: 4px solid #ff0000 !important;"  onclick="jumpToFrame({{ loop.index0 }})">
+                    {% else %}
+                        <img src="{{ frame }}" class="frame-thumbnail" onclick="jumpToFrame({{ loop.index0 }})">
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+        <!-- Text Input Field -->
+<div class="d-flex justify-content-center mt-4">
+    <form class="form-container w-50" method="POST" action="/query">
+        <div class="mb-3 w-100">
+            <textarea id="queryInput" name="queryInput" class="form-control shadow" placeholder="Type your query here..." rows="3"></textarea>
+        </div>
+        <!-- Centering the button -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-dark btn shadow mt-5 mb-5">Search for Moment</button>
+        </div>
+    </form>
+</div>
+
+        
+    </div>
+
+
+
+
+    <script>
+        function jumpToFrame(index) {
+    let video = document.getElementById("rightVideo");
+    let seconds = index; // Assuming 1 frame per second
+
+    video.currentTime = seconds;
+    video.play();
+}
+
+    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
